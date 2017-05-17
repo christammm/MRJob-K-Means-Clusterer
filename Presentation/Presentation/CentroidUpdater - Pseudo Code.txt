@@ -1,0 +1,45 @@
+
+#MapReduce Centroid Updater
+class CentroidUpdate(MRJob):
+
+    #loads centroids from file into list
+    get_centroids(self){
+        open centroid file
+        load centroid locations using pickle
+        close file
+        return centroids
+    }
+
+    # assign each point to a centroid
+    mapper(self, _, line){
+        split line by (',')
+        when the list is empty
+            return
+
+        assign point as array of x , y coordinates
+        assign centroids as get_centroids(self)'s return
+
+        find closest centroid
+        push cluster number , point location as list to combiner
+    }
+
+    # find sum of all points in each cluster and places them together
+    combiner(self, cluster, points){
+        assign sum as array of point values
+        counter starting value 1
+        for each point in points:
+            add point onto sum
+            counter++
+
+        push cluster number and { sum as list and counter} to reducer
+    }
+
+    #finds new centroid points by computing the average
+    reducer(self, cluster, partial_sums){
+        recreate sum as array (sum, number)
+        for each point set, number in partial_sums:
+            sum += point set
+            number += number
+
+        push cluster number , average point(sum/number) as list
+    }

@@ -1,0 +1,35 @@
+%matplotlib inline
+
+
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import scale
+from numpy import random, float
+
+
+import csv
+
+
+f = open('ddata.csv', "r")
+lines = f.read().split("\n") # "\r\n" if needed
+data = []
+for line in lines:
+    if line != "": # add other needed checks to skip titles
+        col1,col2 = line.split(",")
+        data.append([col1,col2])
+        
+data = array(data)
+    
+
+model = KMeans(n_clusters=4)
+
+# Note I'm scaling the data to normalize it! Important for good results.
+model = model.fit(scale(data))
+
+# We can look at the clusters each data point was assigned to
+print model.labels_ 
+
+# And we'll visualize it:
+plt.figure(figsize=(8, 6))
+plt.scatter(data[:,0], data[:,1], c=model.labels_.astype(float))
+plt.show()

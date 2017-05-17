@@ -1,0 +1,40 @@
+
+#MapReduce Centroid Selector
+class CentroidSelector(MRJob):
+
+    # Gets all of the possible coordinates inside the csv file
+    mapper(self, _, line){
+        Extract values of line by splitting by comma(',')
+        x,y -> split next line (',')
+        Push <no key value> , (x,y) to Combiner(findRanges) to a list
+    }
+
+
+    #Finds the maximum and minimum values of the coordinates
+    combiner(self, _, dp){
+        Get current minimum point, and maximum point from the first two values in the list(dp)
+
+        for each datapoint in dp:
+            minPoint -> min(minPoint, datapoint)
+            maxPoint -> max(maxPoint, datapoint)
+
+        Push <no key value> , minPoint to a list(minmax) in the reducer(selectCentroids)
+        Push <no key value> , maxPoint to a list(minmax) in the reducer(selectCentroids)
+    }
+
+
+   #Based on the maximum and minimum Points, determine centroids
+   reducer(self, _, minmax){
+        #Assign minPoint and maxPoint from the minMax list
+        minPoint, maxPoint -> minmax.next()
+        for each datapoint in minmax:
+            minPoint -> min(minPoint, datapoint)
+            maxPoint -> max(maxPoint, datapoint)
+
+        # Find the K "average" centroids
+        k -> number of cluster (e.g. - 2,4,8,etc)
+        average = (maxPoint-minPoint) divided by k
+
+        for i = 0 to the range of k ( e.g.- if k=2, then the range is [0,1])
+            Push <no key value>, (minPoint + average * i) to some list that stores centroids
+    }
